@@ -6,10 +6,7 @@ import android.app.TimePickerDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
-import android.widget.DatePicker
-import android.widget.EditText
-import android.widget.TimePicker
+import android.widget.*
 import com.alex_ia.todo_app.MainActivity.Companion.NEW_TASK
 import com.alex_ia.todo_app.MainActivity.Companion.NEW_TASK_KEY
 import java.time.LocalDate
@@ -45,14 +42,18 @@ class FormActivity : AppCompatActivity() {
         edtDate.setOnClickListener {
             val nowDate = LocalDate.now()
 
-            DatePickerDialog(this,
+
+           val dataPicker =  DatePickerDialog(this,
                 { _, year, month, dayOfMonth ->
                     edtDate.setText("$dayOfMonth/$month/$year")
                 },
                 nowDate.year,
                 nowDate.monthValue - 1,
                 nowDate.dayOfMonth
-            ).show()
+            )
+            dataPicker.datePicker.minDate = System.currentTimeMillis()
+            dataPicker.show()
+
         }
 
         edtTime.setOnClickListener {
@@ -70,17 +71,24 @@ class FormActivity : AppCompatActivity() {
 
         btnAdd.setOnClickListener {
 
-            setResult(NEW_TASK, Intent().putExtra(
-             NEW_TASK_KEY,
-                Task(
-                    0,
-                    edtTitle.text.toString(),
-                    edtDescription.text.toString(),
-                    LocalDateTime.of(LocalDate.parse(edtDate.text, DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-                        LocalTime.parse(edtTime.text, DateTimeFormatter.ofPattern("HH:mm")))
-                )
-         ))
-            finish()
+            if (edtTitle.text.isNotEmpty() && edtDate.text.isNotEmpty() && edtDescription.text.isNotEmpty() && edtTime.text.isNotEmpty()){
+                setResult(NEW_TASK, Intent().putExtra(
+                    NEW_TASK_KEY,
+                    Task(
+                        0,
+                        edtTitle.text.toString(),
+                        edtDescription.text.toString(),
+                        LocalDateTime.of(LocalDate.parse(edtDate.text, DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                            LocalTime.parse(edtTime.text, DateTimeFormatter.ofPattern("HH:mm")))
+                    )
+                ))
+                finish()
+            }else{
+                showMessege("You have to fill in all the data")
+            }
         }
     }
+
+    fun showMessege(message: String) =
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 }

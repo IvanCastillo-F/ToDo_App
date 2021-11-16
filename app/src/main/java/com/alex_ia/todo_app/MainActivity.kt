@@ -24,8 +24,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var adapter: TaskAdapter
     private var tasks = mutableListOf(
-        Task(0,"","", LocalDateTime.now()),
-        Task(1,"","", LocalDateTime.now())
+        Task(0,"Test","hello world", LocalDateTime.now()),
+        Task(1,"Test1","Hello wold", LocalDateTime.now())
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
