@@ -1,5 +1,6 @@
 package com.alex_ia.todo_app
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,13 +21,14 @@ class TaskAdapter(val list: MutableList<Task>) :RecyclerView.Adapter<TaskAdapter
     }
 
     override fun onBindViewHolder(holder: TaskAdapter.TaskViewHolder, position: Int) {
-        holder.bind(list[position], position)
+        holder.bind(list[position], holder.adapterPosition)
     }
 
     override fun getItemCount() = list.size
 
 
     inner class TaskViewHolder(private val view:View):RecyclerView.ViewHolder(view){
+        @SuppressLint("NotifyDataSetChanged")
         fun bind(data:Task, position: Int) = view.apply {
 
             val txvTitle = findViewById<TextView>(R.id.txvTitle)
@@ -36,10 +38,15 @@ class TaskAdapter(val list: MutableList<Task>) :RecyclerView.Adapter<TaskAdapter
             txvTitle.text = data.title
             txvDatetime.text = data.dateTime.format(DateTimeFormatter.ofPattern("dd/MM/yy HH:mm a"))
 
+            if (chkFinished.isChecked){
+                chkFinished.isChecked = false
+                chkFinished.isSelected = false
+            }
+
             chkFinished.setOnClickListener{
                 list.removeAt(position)
 
-                notifyItemRemoved(position)
+                notifyDataSetChanged()
             }
 
             rootView.setOnClickListener {  }

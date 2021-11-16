@@ -45,19 +45,16 @@ class FormActivity : AppCompatActivity() {
 
            val dataPicker =  DatePickerDialog(this,
                 { _, year, month, dayOfMonth ->
+                    val month1 = month + 1
                     if(dayOfMonth < 10){
-                        edtDate.setText("0$dayOfMonth/$month/$year")
-                        if(month in 1..9){
-                            edtDate.setText("0$dayOfMonth/0$month/$year")
-                        }else if(month == 0){
-                            edtDate.setText("0$dayOfMonth/01/$year")
+                        edtDate.setText("0$dayOfMonth/$month1/$year")
+                        if(month1 < 10){
+                            edtDate.setText("0$dayOfMonth/0$month1/$year")
                         }
                     }else{
-                        edtDate.setText("$dayOfMonth/$month/$year")
-                        if(month in 1..9){
-                            edtDate.setText("$dayOfMonth/0$month/$year")
-                        }else if(month == 0){
-                            edtDate.setText("$dayOfMonth/01/$year")
+                        edtDate.setText("$dayOfMonth/$month1/$year")
+                        if(month < 10 ){
+                            edtDate.setText("$dayOfMonth/0$month1/$year")
                         }
                     }
                 },
