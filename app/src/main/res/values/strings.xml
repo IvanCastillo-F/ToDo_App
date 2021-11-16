@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">todo_app</string>
+    <string name="task_title">Task Title</string>
+    <string name="task_description">Task Description</string>
+    <string name="task_date">Task Date</string>
+    <string name="task_time">Task Time</string>
+    <string name="save">Save</string>
+</resources>
