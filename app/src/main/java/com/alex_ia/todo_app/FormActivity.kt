@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.widget.*
 import com.alex_ia.todo_app.MainActivity.Companion.NEW_TASK
 import com.alex_ia.todo_app.MainActivity.Companion.NEW_TASK_KEY
+import com.alex_ia.todo_app.MainActivity.Companion.UPDATE_TASK
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -22,12 +23,26 @@ class FormActivity : AppCompatActivity() {
     private lateinit var edtDescription: EditText
     private lateinit var btnAdd: Button
 
+    private var isDetailTask = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_form)
 
+        isDetailTask = intent.getBooleanExtra("isTaskDetail",false)
 
         initViews()
+        if (isDetailTask) setTaskinfo(intent.getParcelableExtra("task")?: Task())
+    }
+
+    private fun setTaskinfo(task: Task) {
+
+        edtTitle.setText(task.title)
+        edtDescription.setText(task.description)
+        edtDate.setText(task.dateTime?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+        edtTime.setText(task.dateTime?.format(DateTimeFormatter.ofPattern("HH:mm")))
+
+        btnAdd.text = "Update"
 
     }
 
@@ -93,10 +108,12 @@ class FormActivity : AppCompatActivity() {
         btnAdd.setOnClickListener {
 
             if (edtTitle.text.isNotEmpty() && edtDate.text.isNotEmpty() && edtDescription.text.isNotEmpty() && edtTime.text.isNotEmpty()){
-                setResult(NEW_TASK, Intent().putExtra(
+                setResult(
+                   if (isDetailTask) UPDATE_TASK else NEW_TASK,
+                    Intent().putExtra(
                     NEW_TASK_KEY,
                     Task(
-                        0,
+                        intent.getParcelableExtra<Task>("task")?.id ?: 0,
                         edtTitle.text.toString(),
                         edtDescription.text.toString(),
                         LocalDateTime.of(LocalDate.parse(edtDate.text, DateTimeFormatter.ofPattern("dd/MM/yyyy")),

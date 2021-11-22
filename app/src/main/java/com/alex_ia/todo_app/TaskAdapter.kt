@@ -9,11 +9,30 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.checkbox.MaterialCheckBox
 import java.time.format.DateTimeFormatter
 
-class TaskAdapter(val list: MutableList<Task>) :RecyclerView.Adapter<TaskAdapter.TaskViewHolder>(){
+class TaskAdapter(
+    val list: MutableList<Task>,
+    var OnClickDoneTask:(task:Task,position:Int)->Unit,
+    var OnClickDetailTask:(task:Task)->Unit
+    ):
+    RecyclerView.Adapter<TaskAdapter.TaskViewHolder>(){
 
     fun add(task:Task){
         list.add(task)
         notifyItemInserted(list.size - 1)
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun removeTask(position: Int){
+        list.removeAt(position)
+
+        notifyDataSetChanged()
+    }
+
+    fun update(task:Task){
+        val index = list.indexOfFirst { it.id == task.id }
+        list[index] = task
+
+        notifyItemChanged(index)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskAdapter.TaskViewHolder {
@@ -36,7 +55,7 @@ class TaskAdapter(val list: MutableList<Task>) :RecyclerView.Adapter<TaskAdapter
             val chkFinished: MaterialCheckBox = findViewById(R.id.chkFinished)
 
             txvTitle.text = data.title
-            txvDatetime.text = data.dateTime.format(DateTimeFormatter.ofPattern("dd/MM/yy HH:mm a"))
+            txvDatetime.text = data.dateTime?.format(DateTimeFormatter.ofPattern("dd/MM/yy HH:mm a"))
 
             if (chkFinished.isChecked){
                 chkFinished.isChecked = false
@@ -44,12 +63,12 @@ class TaskAdapter(val list: MutableList<Task>) :RecyclerView.Adapter<TaskAdapter
             }
 
             chkFinished.setOnClickListener{
-                list.removeAt(position)
-
-                notifyDataSetChanged()
+              OnClickDoneTask(data,position)
             }
 
-            rootView.setOnClickListener {  }
+            rootView.setOnClickListener {
+                OnClickDetailTask(data)
+            }
         }
     }
 }
