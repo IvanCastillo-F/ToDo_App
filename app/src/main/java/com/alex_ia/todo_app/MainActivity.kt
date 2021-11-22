@@ -40,6 +40,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var db:TaskDataBase
 
+    private var isDetailTask = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -52,6 +54,18 @@ class MainActivity : AppCompatActivity() {
         CreateNotificationChannel()
 
         initViews()
+
+        isDetailTask = intent.getBooleanExtra("isTaskDetail",false)
+
+        val taskNotification = intent.getParcelableExtra("task")?: Task()
+
+        if (isDetailTask){
+            val resultIntent = Intent(this, FormActivity::class.java).apply {
+                putExtra("isTaskDetail",true)
+                putExtra("task",taskNotification)
+            }
+            startActivity(resultIntent)
+        }
     }
 
     override fun onResume() {
@@ -82,7 +96,9 @@ class MainActivity : AppCompatActivity() {
                     status = false
                 })
                 adapter.removeTask(position)
+
             }
+            cancel(task.id)
         },OnClickDetailTask ={ task ->
             startActivityForResult(Intent(this, FormActivity::class.java).apply {
                 putExtra("isTaskDetail",true)
@@ -113,14 +129,14 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 MainScope().launch(Dispatchers.IO) {
-                    db.taskDao().saveNewTask(it)
+                    val id = db.taskDao().saveNewTask(it)
 
                     val zone = OffsetDateTime.now().offset
                     val selectedMillis = it.dateTime?.toInstant(zone)?.toEpochMilli() ?: 0
                     val nowMillis = LocalDateTime.now().toInstant(zone).toEpochMilli()
 
                     scheduleNotification(selectedMillis - nowMillis, Data.Builder().apply{
-                        putInt("notificationID",it.id)
+                        putInt("notificationID",id.toInt())
                         putString("notificationTitle", it.title)
                         putString("notificationDescription", it.description)
                         putString("notificationDateTime",it.dateTime.toString())
@@ -166,5 +182,11 @@ class MainActivity : AppCompatActivity() {
             val notificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
+    }
+
+    private fun cancel(id:Int){
+
+        WorkManager.getInstance(this).cancelUniqueWork("NOTIFICATION_WORK $id")
+
     }
 }

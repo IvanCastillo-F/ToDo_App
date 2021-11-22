@@ -21,7 +21,7 @@ class NotificationManagerImpl(private val context: Context,params: WorkerParamet
 
     fun CreateNotification(task: Task){
 
-        val resultIntent = Intent(context, FormActivity::class.java).apply {
+        val resultIntent = Intent(context, MainActivity::class.java).apply {
             putExtra("isTaskDetail",true)
             putExtra("task",task)
         }
